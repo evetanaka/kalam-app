@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "kalam",
+    "slug": "kalam",
+    "version": "0.1.0",
+    "scheme": "kalam",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B5C3B"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ikigai.kalam",
+      "infoPlist": {
+        "NSContactsUsageDescription": "Kalam compare les numéros de vos contacts de façon privée pour retrouver vos amis.",
+        "NSCameraUsageDescription": "Scanner des QR codes et prendre des photos.",
+        "NSFaceIDUsageDescription": "Protéger votre compte avec Face ID."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B5C3B"
+      },
+      "package": "com.ikigai.kalam"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
