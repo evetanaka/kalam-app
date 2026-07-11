@@ -1,49 +1,49 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTheme } from '@kalam/theme';
+import { useTheme, memberColor } from '@kalam/theme';
 import { useTranslation } from '@kalam/i18n';
-import { Header, Text, Avatar, SecurityBadge, DateSeparator } from '@kalam/ui';
-import { useConversationStore } from '@kalam/stores';
-import { useMessageStore, type Message } from '@kalam/stores';
+import { Avatar, SecurityBadge, DateSeparator, Text } from '@kalam/ui';
+import { useConversationStore, useMessageStore, type Message } from '@kalam/stores';
 import { MessageItem } from '../../components/MessageItem';
 import { ChatInputBar } from '../../components/ChatInputBar';
 import { SearchOverlay } from '../../components/SearchOverlay';
 import { useChat } from '../../hooks/useChat';
 
-function seedMockMessages(conversationId: string, addMessage: (m: Message) => void) {
+function seedGroupMessages(conversationId: string, addMessage: (m: Message) => void) {
   const now = Date.now();
-  const me = 'me';
-  const other = 'alice';
-
-  const mocks: Partial<Message>[] = [
-    { senderId: other, text: 'Salut ! Comment ça va ?', timestamp: now - 3600000 * 4, status: 'read' },
-    { senderId: me, text: 'Ça va bien merci ! Et toi ?', timestamp: now - 3600000 * 3.9, status: 'read' },
-    { senderId: other, text: "Super ! J'ai trouvé un super restaurant pour ce soir", timestamp: now - 3600000 * 3.8, status: 'read' },
-    { senderId: me, text: "Ah cool ! C'est où ?", timestamp: now - 3600000 * 3.7, status: 'read' },
-    { senderId: other, text: "Rue de la Paix, tu connais ? C'est un petit italien authentique avec des pâtes fraîches faites maison. Le chef vient de Naples et les critiques sont excellentes.", timestamp: now - 3600000 * 3.6, status: 'read' },
-    { senderId: me, text: '👍', timestamp: now - 3600000 * 3.5, status: 'read' },
-    { senderId: other, text: 'On réserve pour 20h ?', timestamp: now - 3600000 * 2, status: 'read' },
-    { senderId: me, text: 'Parfait ! Je serai là', timestamp: now - 3600000 * 1.9, status: 'delivered' },
-    { senderId: other, text: 'Tu peux inviter Marie aussi si tu veux', timestamp: now - 3600000 * 1.5, status: 'read' },
-    { senderId: me, text: 'Bonne idée, je lui envoie un message', timestamp: now - 3600000 * 1.4, status: 'delivered' },
-    { senderId: other, text: 'Super ❤️', timestamp: now - 3600000, status: 'read' },
-    { senderId: me, text: 'Marie est dispo !', timestamp: now - 1800000, status: 'sent', quotedMessageId: 'mock-msg-9' },
-    { senderId: other, text: 'Excellent ! On va bien manger 🍝', timestamp: now - 900000, status: 'read' },
-    { senderId: me, text: "J'ai hâte !", timestamp: now - 600000, status: 'sent' },
-    { senderId: other, text: 'À ce soir alors ! 🎉', timestamp: now - 300000, status: 'read' },
+  const texts = [
+    { s: 'alice', t: 'Salut tout le monde ! 👋' },
+    { s: 'bob', t: 'Hey ! Quoi de neuf ?' },
+    { s: 'me', t: 'Yo ! Prêts pour le projet ?' },
+    { s: 'charlie', t: "J'ai commencé les maquettes" },
+    { s: 'alice', t: 'Super ! Tu peux partager ?' },
+    { s: 'charlie', t: 'Je les envoie ce soir' },
+    { s: 'bob', t: 'Parfait, on avance bien' },
+    { s: 'me', t: 'Le backend est presque prêt aussi' },
+    { s: 'alice', t: 'On fait un point demain à 10h ?' },
+    { s: 'bob', t: '10h ça me va 👍' },
+    { s: 'charlie', t: 'Pareil pour moi' },
+    { s: 'me', t: "OK, je crée l'event" },
+    { s: 'alice', t: 'Merci !' },
+    { s: 'bob', t: 'Au fait, avez-vous vu le nouveau design ?' },
+    { s: 'charlie', t: "Oui c'est clean ! J'adore les couleurs" },
+    { s: 'me', t: 'Le vert Kalam est parfait 💚' },
+    { s: 'alice', t: 'On devrait ajouter des animations aussi' },
+    { s: 'bob', t: 'Bonne idée, mais pas trop pour les perf' },
+    { s: 'charlie', t: "Je suis d'accord avec Bob" },
+    { s: 'me', t: 'On en reparle demain alors ! 🚀' },
   ];
 
-  mocks.forEach((m, i) => {
+  texts.forEach((m, i) => {
     addMessage({
-      id: `mock-msg-${i}`,
+      id: `group-msg-${i}`,
       conversationId,
-      senderId: m.senderId!,
-      text: m.text!,
-      timestamp: m.timestamp!,
-      status: m.status as Message['status'],
+      senderId: m.s,
+      text: m.t,
+      timestamp: now - (20 - i) * 300000,
+      status: 'read',
       type: 'text',
-      quotedMessageId: m.quotedMessageId,
-      reactions: i === 10 ? [{ emoji: '❤️', userIds: [me] }] : i === 4 ? [{ emoji: '😍', userIds: [other] }, { emoji: '🔥', userIds: [me, other] }] : [],
+      reactions: [],
       isEphemeral: false,
       isFailed: false,
     });
@@ -64,9 +64,10 @@ function formatDateSeparator(timestamp: number, t: (key: string) => string): str
   return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
 }
 
-export function ChatPage() {
+export function GroupChatPage() {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const conversationId = id ?? '';
 
@@ -78,13 +79,19 @@ export function ChatPage() {
 
   const { messages, currentUserId, sendMessage, deleteMessage, toggleReaction, findMessage } = useChat(conversationId);
 
-  const navigate = useNavigate();
   const [quotedMessage, setQuotedMessage] = useState<{ id: string; senderName: string; text: string } | null>(null);
   const [showSearch, setShowSearch] = useState(false);
 
+  const members = conversation?.members ?? [];
+  const memberNames = useMemo(() => {
+    const map: Record<string, string> = {};
+    members.forEach((m) => { map[m.id] = m.name; });
+    return map;
+  }, [members]);
+
   useEffect(() => {
     const existing = messagesByConversation[conversationId];
-    if (!existing || existing.length === 0) seedMockMessages(conversationId, addMessageToStore);
+    if (!existing || existing.length === 0) seedGroupMessages(conversationId, addMessageToStore);
   }, [conversationId]);
 
   useEffect(() => {
@@ -101,7 +108,7 @@ export function ChatPage() {
     if (action === 'reply') {
       setQuotedMessage({
         id: message.id,
-        senderName: message.senderId === currentUserId ? 'Vous' : (conversation?.name ?? ''),
+        senderName: message.senderId === currentUserId ? 'Vous' : (memberNames[message.senderId] ?? message.senderId),
         text: message.text,
       });
     } else if (action === 'forward') {
@@ -111,26 +118,21 @@ export function ChatPage() {
     } else if (action === 'delete') {
       deleteMessage(message.id);
     }
-  }, [currentUserId, conversation, deleteMessage]);
+  }, [currentUserId, memberNames, deleteMessage, navigate, conversationId]);
 
   const handleReaction = useCallback((messageId: string, emoji: string) => {
     toggleReaction(messageId, emoji);
   }, [toggleReaction]);
 
-  // Build list items (reversed for bottom-up display)
   const listItems = useMemo(() => {
     const items: Array<{ type: 'message'; message: Message; isLast: boolean } | { type: 'date'; date: string; key: string }> = [];
-    // messages is sorted newest first
-    const reversed = [...messages]; // newest first
-
+    const reversed = [...messages];
     for (let i = 0; i < reversed.length; i++) {
       const msg = reversed[i];
       const prevMsg = i > 0 ? reversed[i - 1] : null;
       const nextMsg = reversed[i + 1];
       const isLast = !prevMsg || prevMsg.senderId !== msg.senderId;
-
       items.push({ type: 'message', message: msg, isLast });
-
       if (nextMsg && isDifferentDay(msg.timestamp, nextMsg.timestamp)) {
         items.push({ type: 'date', date: formatDateSeparator(nextMsg.timestamp, t), key: `date-${nextMsg.timestamp}` });
       }
@@ -138,20 +140,18 @@ export function ChatPage() {
         items.push({ type: 'date', date: formatDateSeparator(msg.timestamp, t), key: `date-${msg.timestamp}` });
       }
     }
-
-    return items.reverse(); // oldest first for normal scroll
+    return items.reverse();
   }, [messages, t]);
 
   if (!conversation) {
     return (
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--soft)' }}>
-        <div style={{ textAlign: 'center' }}>
-          <span style={{ fontSize: 48 }}>💬</span>
-          <p style={{ marginTop: 16, fontSize: 16 }}>Sélectionnez une conversation</p>
-        </div>
+        <p>Sélectionnez une conversation</p>
       </div>
     );
   }
+
+  const avatarMembers = members.slice(0, 4);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -161,18 +161,21 @@ export function ChatPage() {
         display: 'flex', alignItems: 'center', gap: 12,
         borderBottom: '0.5px solid var(--hair)', backgroundColor: 'white',
       }}>
-        <Avatar size="sm" name={conversation.name} />
-        <span style={{ flex: 1, fontWeight: 600, fontSize: 16, color: 'var(--ink)' }}>{conversation.name}</span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', width: 40, height: 40, gap: 1 }}>
+          {avatarMembers.map((m) => <Avatar key={m.id} size="xs" name={m.name} />)}
+        </div>
+        <div style={{ flex: 1 }}>
+          <span style={{ fontWeight: 600, fontSize: 16, color: 'var(--ink)' }}>{conversation.name}</span>
+          <div style={{ fontSize: 12, color: 'var(--soft)' }}>{t('chat.members', { count: members.length })}</div>
+        </div>
         <button onClick={() => setShowSearch((s) => !s)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, minWidth: 44, minHeight: 44 }}>🔍</button>
-        <button onClick={() => navigate(`/conversation-info/${conversationId}?type=direct`)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, minWidth: 44, minHeight: 44 }}>ℹ️</button>
+        <button onClick={() => navigate(`/conversation-info/${conversationId}?type=group`)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, minWidth: 44, minHeight: 44 }}>ℹ️</button>
       </div>
 
       {/* Crypto line */}
-      <div style={{
-        height: 28, display: 'flex', justifyContent: 'center', alignItems: 'center',
-        backgroundColor: theme.colors.pale,
-      }}>
+      <div style={{ height: 28, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.pale, gap: 8 }}>
         <SecurityBadge verified />
+        <Text variant="caption" color="textSoft">{t('chat.members', { count: members.length })}</Text>
       </div>
 
       {showSearch && (
@@ -184,19 +187,15 @@ export function ChatPage() {
       )}
 
       {/* Messages */}
-      <div style={{
-        flex: 1, overflowY: 'auto', padding: '8px 0',
-        display: 'flex', flexDirection: 'column',
-      }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0', display: 'flex', flexDirection: 'column' }}>
         {listItems.map((item) => {
-          if (item.type === 'date') {
-            return <DateSeparator key={item.key} date={item.date} />;
-          }
+          if (item.type === 'date') return <DateSeparator key={item.key} date={item.date} />;
           const msg = item.message;
+          const isOut = msg.senderId === currentUserId;
           let quoted: { senderName: string; text: string } | undefined;
           if (msg.quotedMessageId) {
             const qm = findMessage(msg.quotedMessageId);
-            if (qm) quoted = { senderName: qm.senderId === currentUserId ? 'Vous' : (conversation.name ?? ''), text: qm.text };
+            if (qm) quoted = { senderName: qm.senderId === currentUserId ? 'Vous' : (memberNames[qm.senderId] ?? qm.senderId), text: qm.text };
           }
           return (
             <MessageItem
@@ -207,17 +206,14 @@ export function ChatPage() {
               quotedMessage={quoted}
               onLongPress={handleLongPress}
               onReaction={handleReaction}
+              senderName={!isOut ? (memberNames[msg.senderId] ?? msg.senderId) : undefined}
+              senderColor={!isOut ? memberColor(msg.senderId) : undefined}
             />
           );
         })}
       </div>
 
-      {/* Input */}
-      <ChatInputBar
-        onSend={handleSend}
-        quotedMessage={quotedMessage}
-        onCancelQuote={() => setQuotedMessage(null)}
-      />
+      <ChatInputBar onSend={handleSend} quotedMessage={quotedMessage} onCancelQuote={() => setQuotedMessage(null)} />
     </div>
   );
 }

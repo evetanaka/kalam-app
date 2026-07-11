@@ -256,11 +256,44 @@
     "title": "Disappearing messages",
     "explanation": "Messages will disappear after the chosen duration. On a peer-to-peer network, disappearing is a courtesy between clients, not a guarantee.",
     "disabled": "Off",
+    "5m": "5 minutes",
+    "1h": "1 hour",
+    "1d": "1 day",
+    "1w": "1 week",
     "24h": "24 hours",
     "7d": "7 days",
     "30d": "30 days",
     "90d": "90 days",
+    "5mDesc": "Messages disappear after 5 minutes",
+    "1hDesc": "Messages disappear after 1 hour",
+    "1dDesc": "Messages disappear after 1 day",
+    "1wDesc": "Messages disappear after 1 week",
+    "disabledDesc": "Messages don't disappear",
     "activated": "{{name}} turned on disappearing messages · {{duration}}"
+  },
+  "conversationInfo": {
+    "title": "Info",
+    "e2e": "End-to-end encryption",
+    "media": "Media, links, documents",
+    "mediaCount": "{{count}} items",
+    "ephemeralMessages": "Disappearing messages",
+    "notifications": "Notifications",
+    "block": "Block",
+    "report": "Report",
+    "leaveGroup": "Leave group",
+    "editGroupName": "Edit group name",
+    "members": "Members",
+    "addMember": "Add a member"
+  },
+  "forward": {
+    "title": "Forward to",
+    "search": "Search a conversation…",
+    "send": "Send",
+    "noConversations": "No conversations"
+  },
+  "searchChat": {
+    "placeholder": "Search in conversation…",
+    "noResults": "No results"
   },
   "contacts": {
     "title": "Contacts",

@@ -11,6 +11,9 @@ interface MessageItemProps {
   quotedMessage?: { senderName: string; text: string };
   onLongPress: (message: Message) => void;
   onReaction: (messageId: string, emoji: string) => void;
+  senderName?: string;
+  senderColor?: string;
+  highlightTerm?: string;
 }
 
 function mapStatus(status: Message['status']): MessageStatusType {
@@ -34,6 +37,9 @@ function MessageItemInner({
   quotedMessage,
   onLongPress,
   onReaction,
+  senderName,
+  senderColor,
+  highlightTerm,
 }: MessageItemProps) {
   const { theme } = useTheme();
   const isOut = message.senderId === currentUserId;
@@ -59,6 +65,18 @@ function MessageItemInner({
 
   return (
     <div style={{ padding: '0 8px' }} onContextMenu={handleContextMenu}>
+      {senderName && !isOut && isLast && (
+        <div style={{ paddingLeft: 12, marginBottom: 2 }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: senderColor || theme.colors.primary }}>
+            {senderName}
+          </span>
+        </div>
+      )}
+      {message.forwardedFrom && (
+        <div style={{ paddingLeft: 12, marginBottom: 2, display: 'flex', justifyContent: isOut ? 'flex-end' : 'flex-start' }}>
+          <span style={{ fontSize: 11, fontStyle: 'italic', color: theme.colors.textSoft }}>↗ Transféré</span>
+        </div>
+      )}
       <Bubble
         variant={variant}
         text={message.text}

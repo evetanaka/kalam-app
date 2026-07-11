@@ -3,6 +3,16 @@ import { persist } from 'zustand/middleware'
 import { storageAdapter } from './storageAdapter'
 import type { MessageStatus } from './messageStore'
 
+/** Member with role info (for groups). */
+export interface ConversationMember {
+  id: string
+  name: string
+  role: 'admin' | 'member'
+}
+
+/** Ephemeral duration preset. */
+export type EphemeralDuration = 'off' | '5m' | '1h' | '1d' | '1w'
+
 /** A conversation (1:1 or group). */
 export interface Conversation {
   /** Unique conversation identifier */
@@ -30,8 +40,12 @@ export interface Conversation {
   isEphemeral: boolean
   /** Ephemeral message lifetime in seconds (if enabled) */
   ephemeralDuration?: number
+  /** Ephemeral duration preset */
+  ephemeralPreset?: EphemeralDuration
   /** Member IDs (for groups) */
   memberIds: string[]
+  /** Members with role info (for groups) */
+  members?: ConversationMember[]
   /** Timestamp of last activity (for sorting) */
   updatedAt: number
 }

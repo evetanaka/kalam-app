@@ -9,6 +9,21 @@ use crate::types::Timestamp;
 use crate::KalamError;
 use serde::{Deserialize, Serialize};
 
+/// Content type for envelope payloads.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ContentType {
+    /// Normal application message.
+    Application,
+    /// MLS commit message.
+    Commit,
+    /// MLS welcome message for new members.
+    Welcome,
+    /// MLS proposal message.
+    Proposal,
+    /// Ephemeral config change notification.
+    EphemeralConfig,
+}
+
 /// A transport envelope ready to be sent over the network.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Envelope {

@@ -256,11 +256,44 @@
     "title": "Messages éphémères",
     "explanation": "Les messages s'effaceront après la durée choisie. Sur un réseau pair-à-pair, l'effacement est une politesse entre clients, pas une garantie.",
     "disabled": "Désactivé",
+    "5m": "5 minutes",
+    "1h": "1 heure",
+    "1d": "1 jour",
+    "1w": "1 semaine",
     "24h": "24 heures",
     "7d": "7 jours",
     "30d": "30 jours",
     "90d": "90 jours",
+    "5mDesc": "Les messages s'effacent après 5 minutes",
+    "1hDesc": "Les messages s'effacent après 1 heure",
+    "1dDesc": "Les messages s'effacent après 1 jour",
+    "1wDesc": "Les messages s'effacent après 1 semaine",
+    "disabledDesc": "Les messages ne s'effacent pas",
     "activated": "{{name}} a activé les messages éphémères · {{duration}}"
+  },
+  "conversationInfo": {
+    "title": "Infos",
+    "e2e": "Chiffrement de bout en bout",
+    "media": "Médias, liens, documents",
+    "mediaCount": "{{count}} éléments",
+    "ephemeralMessages": "Messages éphémères",
+    "notifications": "Notifications",
+    "block": "Bloquer",
+    "report": "Signaler",
+    "leaveGroup": "Quitter le groupe",
+    "editGroupName": "Modifier le nom du groupe",
+    "members": "Membres",
+    "addMember": "Ajouter un membre"
+  },
+  "forward": {
+    "title": "Transférer à",
+    "search": "Rechercher une conversation…",
+    "send": "Envoyer",
+    "noConversations": "Aucune conversation"
+  },
+  "searchChat": {
+    "placeholder": "Rechercher dans la conversation…",
+    "noResults": "Aucun résultat"
   },
   "contacts": {
     "title": "Contacts",

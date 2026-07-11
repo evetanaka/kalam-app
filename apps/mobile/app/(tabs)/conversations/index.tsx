@@ -93,6 +93,25 @@ function seedMockConversations(addConversation: (c: Conversation) => void) {
       memberIds: ['eve'],
       updatedAt: now - 604800000,
     },
+    {
+      id: 'conv-group-1',
+      type: 'group',
+      name: 'Kalam Team',
+      avatarUrl: null,
+      lastMessage: { text: 'On en reparle demain alors ! 🚀', timestamp: now - 120000, status: 'read', senderId: 'me' },
+      unreadCount: 3,
+      isPinned: false,
+      isMuted: false,
+      isEphemeral: false,
+      memberIds: ['me', 'alice', 'bob', 'charlie'],
+      members: [
+        { id: 'me', name: 'Vous', role: 'admin' },
+        { id: 'alice', name: 'Alice.kalam', role: 'member' },
+        { id: 'bob', name: 'Bob.kalam', role: 'member' },
+        { id: 'charlie', name: 'Charlie.kalam', role: 'member' },
+      ],
+      updatedAt: now - 120000,
+    },
   ];
 
   mocks.forEach((c) => addConversation(c));
@@ -137,9 +156,14 @@ export default function ConversationsIndexScreen() {
 
   const handlePress = useCallback(
     (id: string) => {
-      router.push({ pathname: '/(tabs)/conversations/chat', params: { id } });
+      const conv = conversations.find((c) => c.id === id);
+      if (conv?.type === 'group') {
+        router.push({ pathname: '/(tabs)/conversations/group-chat', params: { id } });
+      } else {
+        router.push({ pathname: '/(tabs)/conversations/chat', params: { id } });
+      }
     },
-    [router],
+    [router, conversations],
   );
 
   const handleLongPress = useCallback((id: string) => {

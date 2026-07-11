@@ -2,7 +2,7 @@ export { useAuthStore } from './authStore'
 export type { AuthState, Account, Passkey } from './authStore'
 
 export { useConversationStore } from './conversationStore'
-export type { ConversationState, Conversation } from './conversationStore'
+export type { ConversationState, Conversation, ConversationMember, EphemeralDuration } from './conversationStore'
 
 export { useMessageStore } from './messageStore'
 export type { MessageState, Message, MessageStatus, MessageType, Reaction } from './messageStore'

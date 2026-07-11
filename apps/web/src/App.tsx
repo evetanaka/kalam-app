@@ -17,6 +17,11 @@ import { SyncHistoryPage } from './pages/auth/SyncHistoryPage';
 // Conversation pages
 import { ChatPage } from './pages/conversations/ChatPage';
 import { NewConversationPage } from './pages/conversations/NewConversationPage';
+import { GroupChatPage } from './pages/conversations/GroupChatPage';
+import { ConversationInfoPage } from './pages/conversations/ConversationInfoPage';
+import { CreateGroupPage } from './pages/conversations/CreateGroupPage';
+import { EphemeralConfigPage } from './pages/conversations/EphemeralConfigPage';
+import { ForwardMessagePage } from './pages/conversations/ForwardMessagePage';
 
 // Placeholder pages for screens not yet ported
 const ContactList = () => <PlaceholderPage id="S-35" title="Liste des contacts" />;
@@ -91,6 +96,11 @@ export function App() {
       {/* Main app with DesktopLayout */}
       <Route path="/" element={<DesktopLayout><EmptyChat /></DesktopLayout>} />
       <Route path="/chat/:id" element={<DesktopLayout><ChatPage /></DesktopLayout>} />
+      <Route path="/group-chat/:id" element={<DesktopLayout><GroupChatPage /></DesktopLayout>} />
+      <Route path="/conversation-info/:id" element={<DesktopLayout><ConversationInfoPage /></DesktopLayout>} />
+      <Route path="/create-group" element={<DesktopLayout><CreateGroupPage /></DesktopLayout>} />
+      <Route path="/ephemeral/:id" element={<DesktopLayout><EphemeralConfigPage /></DesktopLayout>} />
+      <Route path="/forward" element={<DesktopLayout><ForwardMessagePage /></DesktopLayout>} />
       <Route path="/new" element={<DesktopLayout><NewConversationPage /></DesktopLayout>} />
       <Route path="/contacts" element={<DesktopLayout><ContactList /></DesktopLayout>} />
       <Route path="/contacts/:id" element={<DesktopLayout><ContactDetail /></DesktopLayout>} />

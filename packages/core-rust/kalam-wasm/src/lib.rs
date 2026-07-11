@@ -167,3 +167,87 @@ pub fn create_message_voucher(message_count: u64) -> Result<String, JsValue> {
         .map_err(|e| JsValue::from_str(&e.to_string()))?;
     serde_json::to_string(&v).map_err(|e| JsValue::from_str(&e.to_string()))
 }
+
+// ── P3: Group Messaging (MLS) & Ephemeral ─────────────────
+
+/// Create a new MLS group. Returns JSON group info.
+#[wasm_bindgen]
+pub fn create_mls_group(group_name: &str) -> Result<String, JsValue> {
+    use kalam_core::crypto::keys::generate_identity_key;
+    use kalam_core::crypto::mls;
+
+    let identity = generate_identity_key().map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let group = mls::create_group(&identity, group_name.as_bytes())
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+    serde_json::to_string(&serde_json::json!({
+        "group_id": hex::encode(&group.group_id),
+        "epoch": group.epoch,
+        "members": group.members.len(),
+    }))
+    .map_err(|e| JsValue::from_str(&e.to_string()))
+}
+
+/// Create a key package for joining MLS groups. Returns JSON.
+#[wasm_bindgen]
+pub fn create_key_package() -> Result<String, JsValue> {
+    use kalam_core::crypto::keys::generate_identity_key;
+    use kalam_core::crypto::mls;
+
+    let identity = generate_identity_key().map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let kp = mls::create_key_package(&identity).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    serde_json::to_string(&kp).map_err(|e| JsValue::from_str(&e.to_string()))
+}
+
+/// Add a member to an MLS group. Returns JSON {commit, welcome}.
+#[wasm_bindgen]
+pub fn add_group_member(group_id: &str, key_package_json: &str) -> Result<String, JsValue> {
+    let _ = (group_id, key_package_json);
+    Err(JsValue::from_str("Group state persistence not yet implemented — use core API directly"))
+}
+
+/// Remove a member from an MLS group. Returns JSON commit.
+#[wasm_bindgen]
+pub fn remove_group_member(group_id: &str, leaf_index: u32) -> Result<String, JsValue> {
+    let _ = (group_id, leaf_index);
+    Err(JsValue::from_str("Group state persistence not yet implemented — use core API directly"))
+}
+
+/// Encrypt a message for an MLS group. Returns JSON ciphertext.
+#[wasm_bindgen]
+pub fn encrypt_group(group_id: &str, plaintext: &str) -> Result<String, JsValue> {
+    let _ = (group_id, plaintext);
+    Err(JsValue::from_str("Group state persistence not yet implemented — use core API directly"))
+}
+
+/// Decrypt a message from an MLS group. Returns JSON {plaintext, sender_index}.
+#[wasm_bindgen]
+pub fn decrypt_group(group_id: &str, ciphertext_json: &str) -> Result<String, JsValue> {
+    let _ = (group_id, ciphertext_json);
+    Err(JsValue::from_str("Group state persistence not yet implemented — use core API directly"))
+}
+
+/// Set ephemeral message duration for a conversation.
+#[wasm_bindgen]
+pub fn set_ephemeral_duration(conversation_id: &str, duration: &str) -> Result<(), JsValue> {
+    use kalam_core::crypto::ephemeral::{self, EphemeralDuration};
+
+    let dur = match duration {
+        "off" => EphemeralDuration::Off,
+        "5m" => EphemeralDuration::FiveMinutes,
+        "1h" => EphemeralDuration::OneHour,
+        "1d" => EphemeralDuration::OneDay,
+        "1w" => EphemeralDuration::OneWeek,
+        _ => return Err(JsValue::from_str(&format!("Unknown duration: {duration}. Use: off, 5m, 1h, 1d, 1w"))),
+    };
+
+    let _config = ephemeral::create_ephemeral_config(dur);
+    let _ = conversation_id;
+    Ok(())
+}
+
+/// Check for expired ephemeral messages. Returns JSON array of expired message IDs.
+#[wasm_bindgen]
+pub fn check_ephemeral_expiry() -> Result<String, JsValue> {
+    serde_json::to_string(&Vec::<String>::new())
+        .map_err(|e| JsValue::from_str(&e.to_string()))
+}

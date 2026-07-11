@@ -13,6 +13,12 @@ interface MessageItemProps {
   quotedMessage?: { senderName: string; text: string } | undefined;
   onLongPress: (message: Message) => void;
   onReaction: (messageId: string, emoji: string) => void;
+  /** Sender display name (for group chats) */
+  senderName?: string;
+  /** Sender color (for group chats) */
+  senderColor?: string;
+  /** Search highlight term */
+  highlightTerm?: string;
 }
 
 /** Map store message status to UI MessageStatus type */
@@ -46,6 +52,9 @@ function MessageItemInner({
   quotedMessage,
   onLongPress,
   onReaction,
+  senderName,
+  senderColor,
+  highlightTerm,
 }: MessageItemProps) {
   const { theme } = useTheme();
   const isOut = message.senderId === currentUserId;
@@ -78,6 +87,13 @@ function MessageItemInner({
         minHitSlop={0}
         activeOpacity={1}
       >
+        {senderName && !isOut && isLast && (
+          <View style={[styles.senderNameRow, { paddingLeft: variant === 'in' ? 12 : 0 }]}>
+            <Text style={{ fontSize: 12, fontWeight: '600', color: senderColor || theme.colors.primary }}>
+              {senderName}
+            </Text>
+          </View>
+        )}
         <Bubble
           variant={variant}
           text={message.text}
@@ -87,6 +103,11 @@ function MessageItemInner({
           hasReactions={hasReactions}
           quotedMessage={quotedMessage}
         />
+        {message.forwardedFrom && (
+          <View style={[styles.forwardedLabel, { alignSelf: isOut ? 'flex-end' : 'flex-start' }]}>
+            <Text style={{ fontSize: 11, fontStyle: 'italic', color: theme.colors.textSoft }}>↗ Transféré</Text>
+          </View>
+        )}
       </Pressable>
       {hasReactions && (
         <View style={[styles.reactions, { alignSelf: isOut ? 'flex-end' : 'flex-start' }]}>
@@ -111,5 +132,13 @@ const styles = StyleSheet.create({
     marginTop: -4,
     paddingHorizontal: 12,
     marginBottom: 4,
+  },
+  senderNameRow: {
+    marginBottom: 2,
+  },
+  forwardedLabel: {
+    paddingHorizontal: 12,
+    marginTop: -2,
+    marginBottom: 2,
   },
 });

@@ -6,3 +6,4 @@ export { shadows, type Shadows } from './tokens/shadows';
 export { animations, type Animations } from './tokens/animations';
 export { lightTheme, darkTheme, type Theme } from './theme';
 export { ThemeProvider, useTheme, useThemedStyles } from './ThemeProvider';
+export { memberColor } from './memberColor';

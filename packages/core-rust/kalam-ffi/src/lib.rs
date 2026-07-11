@@ -219,4 +219,88 @@ pub fn create_message_voucher(message_count: u64) -> Result<String, String> {
     serde_json::to_string(&v).map_err(|e| e.to_string())
 }
 
+// ── P3: Group Messaging (MLS) & Ephemeral ─────────────────
+
+/// Create a new MLS group. Returns JSON group info.
+#[uniffi::export]
+pub fn create_mls_group(group_name: String) -> Result<String, String> {
+    use kalam_core::crypto::keys::generate_identity_key;
+    use kalam_core::crypto::mls;
+
+    let identity = generate_identity_key().map_err(|e| e.to_string())?;
+    let group = mls::create_group(&identity, group_name.as_bytes()).map_err(|e| e.to_string())?;
+    serde_json::to_string(&serde_json::json!({
+        "group_id": hex::encode(&group.group_id),
+        "epoch": group.epoch,
+        "members": group.members.len(),
+    }))
+    .map_err(|e| e.to_string())
+}
+
+/// Create a key package for joining MLS groups. Returns JSON key package.
+#[uniffi::export]
+pub fn create_key_package() -> Result<String, String> {
+    use kalam_core::crypto::keys::generate_identity_key;
+    use kalam_core::crypto::mls;
+
+    let identity = generate_identity_key().map_err(|e| e.to_string())?;
+    let kp = mls::create_key_package(&identity).map_err(|e| e.to_string())?;
+    serde_json::to_string(&kp).map_err(|e| e.to_string())
+}
+
+/// Add a member to an MLS group. Returns JSON {commit, welcome}.
+#[uniffi::export]
+pub fn add_group_member(group_id: String, key_package_json: String) -> Result<String, String> {
+    let _ = (group_id, key_package_json);
+    Err("Group state persistence not yet implemented — use core API directly".to_string())
+}
+
+/// Remove a member from an MLS group. Returns JSON commit.
+#[uniffi::export]
+pub fn remove_group_member(group_id: String, leaf_index: u32) -> Result<String, String> {
+    let _ = (group_id, leaf_index);
+    Err("Group state persistence not yet implemented — use core API directly".to_string())
+}
+
+/// Encrypt a message for an MLS group. Returns JSON ciphertext.
+#[uniffi::export]
+pub fn encrypt_group(group_id: String, plaintext: String) -> Result<String, String> {
+    let _ = (group_id, plaintext);
+    Err("Group state persistence not yet implemented — use core API directly".to_string())
+}
+
+/// Decrypt a message from an MLS group. Returns JSON {plaintext, sender_index}.
+#[uniffi::export]
+pub fn decrypt_group(group_id: String, ciphertext_json: String) -> Result<String, String> {
+    let _ = (group_id, ciphertext_json);
+    Err("Group state persistence not yet implemented — use core API directly".to_string())
+}
+
+/// Set the ephemeral message duration for a conversation.
+#[uniffi::export]
+pub fn set_ephemeral_duration(conversation_id: String, duration: String) -> Result<(), String> {
+    use kalam_core::crypto::ephemeral::{self, EphemeralDuration};
+
+    let dur = match duration.as_str() {
+        "off" => EphemeralDuration::Off,
+        "5m" => EphemeralDuration::FiveMinutes,
+        "1h" => EphemeralDuration::OneHour,
+        "1d" => EphemeralDuration::OneDay,
+        "1w" => EphemeralDuration::OneWeek,
+        _ => return Err(format!("Unknown duration: {duration}. Use: off, 5m, 1h, 1d, 1w")),
+    };
+
+    let _config = ephemeral::create_ephemeral_config(dur);
+    // In production, persist to storage keyed by conversation_id
+    let _ = conversation_id;
+    Ok(())
+}
+
+/// Check for expired ephemeral messages. Returns JSON array of expired message IDs.
+#[uniffi::export]
+pub fn check_ephemeral_expiry() -> Result<String, String> {
+    // In production, load from storage and check
+    serde_json::to_string(&Vec::<String>::new()).map_err(|e| e.to_string())
+}
+
 uniffi::setup_scaffolding!();

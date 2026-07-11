@@ -299,7 +299,7 @@ fn decrypt_with_key(
 }
 
 /// AES-256-GCM encrypt. Returns (ciphertext, nonce).
-fn aes_gcm_encrypt(
+pub(crate) fn aes_gcm_encrypt(
     key: &[u8],
     plaintext: &[u8],
     ad: &[u8],
@@ -322,7 +322,7 @@ fn aes_gcm_encrypt(
 }
 
 /// AES-256-GCM decrypt.
-fn aes_gcm_decrypt(
+pub(crate) fn aes_gcm_decrypt(
     key: &[u8],
     ciphertext: &[u8],
     nonce: &[u8],

@@ -83,6 +83,41 @@ impl Database {
                     secret_key BLOB NOT NULL,
                     is_used INTEGER NOT NULL DEFAULT 0
                 );
+
+                CREATE TABLE IF NOT EXISTS mls_groups (
+                    group_id BLOB PRIMARY KEY,
+                    name TEXT,
+                    epoch INTEGER NOT NULL DEFAULT 0,
+                    tree_state BLOB,
+                    created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+                );
+
+                CREATE TABLE IF NOT EXISTS mls_members (
+                    group_id BLOB NOT NULL,
+                    leaf_index INTEGER NOT NULL,
+                    identity BLOB NOT NULL,
+                    credential BLOB,
+                    PRIMARY KEY (group_id, leaf_index)
+                );
+
+                CREATE TABLE IF NOT EXISTS mls_key_packages (
+                    id BLOB PRIMARY KEY,
+                    identity BLOB NOT NULL,
+                    package BLOB,
+                    is_used INTEGER NOT NULL DEFAULT 0
+                );
+
+                CREATE TABLE IF NOT EXISTS ephemeral_configs (
+                    conversation_id TEXT PRIMARY KEY,
+                    duration_secs INTEGER NOT NULL,
+                    updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+                );
+
+                CREATE TABLE IF NOT EXISTS ephemeral_messages (
+                    message_id BLOB PRIMARY KEY,
+                    expire_at INTEGER NOT NULL,
+                    read_at INTEGER
+                );
                 ",
             )
             .map_err(|e| KalamError::Storage(format!("Failed to init schema: {e}")))?;
@@ -109,12 +144,12 @@ mod tests {
         let count: i64 = db
             .conn
             .query_row(
-                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('accounts','contacts','settings','conversations','messages','ratchet_sessions','pre_keys')",
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('accounts','contacts','settings','conversations','messages','ratchet_sessions','pre_keys','mls_groups','mls_members','mls_key_packages','ephemeral_configs','ephemeral_messages')",
                 [],
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(count, 7);
+        assert_eq!(count, 12);
     }
 
     #[test]

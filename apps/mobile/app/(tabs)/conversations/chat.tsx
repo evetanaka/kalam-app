@@ -19,6 +19,7 @@ import { useConversationStore } from '@kalam/stores/src/conversationStore';
 import { useMessageStore, type Message } from '@kalam/stores/src/messageStore';
 import { MessageItem } from '../../../components/MessageItem';
 import { ChatInputBar } from '../../../components/ChatInputBar';
+import { SearchOverlay } from '../../../components/SearchOverlay';
 import { useChat } from '../../../hooks/useChat';
 
 /** Seed mock messages for demo */
@@ -103,6 +104,7 @@ export default function ChatScreen() {
   const [quotedMessage, setQuotedMessage] = useState<{ id: string; senderName: string; text: string } | null>(null);
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
 
   // Seed mock messages on first mount
   useEffect(() => {
@@ -155,7 +157,8 @@ export default function ChatScreen() {
             text: selectedMessage.text,
           });
           break;
-        case 1: // Forward — placeholder
+        case 1: // Forward
+          router.push({ pathname: '/(tabs)/conversations/forward-message', params: { messageId: selectedMessage.id, conversationId } });
           break;
         case 2: // Copy
           try {
@@ -271,7 +274,15 @@ export default function ChatScreen() {
         }
         rightAction={
           <View style={styles.headerRight}>
-            <Avatar size="sm" name={conversation?.name ?? ''} />
+            <Pressable onPress={() => setShowSearch(true)} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }} minHitSlop={0}>
+              <Text style={{ fontSize: 18 }}>🔍</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => router.push({ pathname: '/(tabs)/conversations/conversation-info', params: { id: conversationId, type: '1:1' } })}
+              minHitSlop={0}
+            >
+              <Avatar size="sm" name={conversation?.name ?? ''} />
+            </Pressable>
           </View>
         }
       />
@@ -280,6 +291,14 @@ export default function ChatScreen() {
       <View style={[styles.cryptoLine, { backgroundColor: theme.dark ? theme.colors.backgroundAlt : theme.colors.pale }]}>
         <SecurityBadge verified />
       </View>
+
+      {showSearch && (
+        <SearchOverlay
+          messages={messagesByConversation[conversationId] ?? []}
+          onClose={() => setShowSearch(false)}
+          onNavigate={() => {}}
+        />
+      )}
 
       {/* Messages list */}
       <FlatList

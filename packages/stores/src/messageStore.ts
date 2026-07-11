@@ -55,6 +55,8 @@ export interface Message {
   mediaUrl?: string
   /** Whether the message failed to send */
   isFailed: boolean
+  /** Original conversation ID if this message was forwarded */
+  forwardedFrom?: string
 }
 
 export interface MessageState {
