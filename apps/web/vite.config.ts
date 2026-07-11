@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), wasm()],
   resolve: {
     alias: {
-      'react-native': 'react-native-web',
+      'react-native': path.resolve(__dirname, 'node_modules/react-native-web'),
       '@kalam/theme': path.resolve(__dirname, '../../packages/theme/src'),
       '@kalam/ui': path.resolve(__dirname, '../../packages/ui/src'),
       '@kalam/stores': path.resolve(__dirname, '../../packages/stores/src'),
