@@ -45,6 +45,9 @@ ethers = "2.0"
 thiserror = "2.0"
 anyhow = "1.0"
 
+# Hex encoding
+hex = "0.4"
+
 # Logging
 tracing = "0.1"
 tracing-subscriber = "0.3"
