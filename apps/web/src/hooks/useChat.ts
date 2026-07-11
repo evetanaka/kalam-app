@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react';
-import { useMessageStore } from '@kalam/stores/src/messageStore';
-import { useConversationStore } from '@kalam/stores/src/conversationStore';
-import { useAuthStore } from '@kalam/stores/src/authStore';
-import { useWalletStore } from '@kalam/stores/src/walletStore';
-import type { Message } from '@kalam/stores/src/messageStore';
+import { useMessageStore } from '@kalam/stores';
+import { useConversationStore } from '@kalam/stores';
+import { useAuthStore } from '@kalam/stores';
+import { useWalletStore } from '@kalam/stores';
+import type { Message } from '@kalam/stores';
 
 /**
  * Hook encapsulating chat logic: messages, sending, reactions.

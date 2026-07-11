@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTheme } from '@kalam/theme';
 import { useTranslation } from '@kalam/i18n';
 import { SearchBar, Text, EmptyState } from '@kalam/ui';
-import { useConversationStore, type Conversation } from '@kalam/stores/src/conversationStore';
-import { useWalletStore } from '@kalam/stores/src/walletStore';
+import { useConversationStore, type Conversation } from '@kalam/stores';
+import { useWalletStore } from '@kalam/stores';
 import { ConversationRow } from '../../components/ConversationRow';
 
 function formatCost(cents: number): string {

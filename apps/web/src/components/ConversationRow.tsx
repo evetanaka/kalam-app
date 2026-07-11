@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTheme } from '@kalam/theme';
 import { useTranslation } from '@kalam/i18n';
 import { Avatar, Badge, Text } from '@kalam/ui';
-import type { Conversation } from '@kalam/stores/src/conversationStore';
+import type { Conversation } from '@kalam/stores';
 
 interface ConversationRowProps {
   conversation: Conversation;

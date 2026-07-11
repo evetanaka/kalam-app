@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@kalam/theme';
 import { useTranslation } from '@kalam/i18n';
 import { SearchBar, Text, Avatar, Divider, EmptyState } from '@kalam/ui';
-import { useContactStore, type Contact } from '@kalam/stores/src/contactStore';
-import { useConversationStore, type Conversation } from '@kalam/stores/src/conversationStore';
+import { useContactStore, type Contact } from '@kalam/stores';
+import { useConversationStore, type Conversation } from '@kalam/stores';
 
 export function NewConversationPage() {
   const { theme } = useTheme();

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTheme } from '@kalam/theme';
 import { Bubble, ReactionBar } from '@kalam/ui';
-import type { Message } from '@kalam/stores/src/messageStore';
+import type { Message } from '@kalam/stores';
 import type { MessageStatusType } from '@kalam/ui';
 
 interface MessageItemProps {
