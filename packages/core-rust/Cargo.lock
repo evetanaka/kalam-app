@@ -948,6 +948,7 @@ checksum = "70e796c081cee67dc755e1a36a0a172b897fab85fc3f6bc48307991f64e4eca9"
 dependencies = [
  "curve25519-dalek 4.1.3",
  "ed25519 2.2.3",
+ "rand_core 0.6.4",
  "serde",
  "sha2 0.10.9",
  "subtle",
@@ -2193,7 +2194,9 @@ dependencies = [
 name = "kalam-ffi"
 version = "0.1.0"
 dependencies = [
+ "hex",
  "kalam-core",
+ "rand 0.8.6",
  "serde_json",
  "tokio",
  "uniffi",
@@ -2203,8 +2206,10 @@ dependencies = [
 name = "kalam-wasm"
 version = "0.1.0"
 dependencies = [
+ "hex",
  "js-sys",
  "kalam-core",
+ "rand 0.8.6",
  "serde-wasm-bindgen",
  "serde_json",
  "wasm-bindgen",

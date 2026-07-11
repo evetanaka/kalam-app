@@ -50,6 +50,39 @@ impl Database {
                     key TEXT PRIMARY KEY,
                     value TEXT
                 );
+
+                CREATE TABLE IF NOT EXISTS conversations (
+                    id TEXT PRIMARY KEY,
+                    type TEXT NOT NULL DEFAULT 'direct',
+                    name TEXT,
+                    created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                    updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+                );
+
+                CREATE TABLE IF NOT EXISTS messages (
+                    id TEXT PRIMARY KEY,
+                    conversation_id TEXT NOT NULL,
+                    sender_id TEXT NOT NULL,
+                    ciphertext BLOB NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'sent',
+                    type TEXT NOT NULL DEFAULT 'text',
+                    timestamp INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+                    expires_at INTEGER,
+                    FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+                );
+
+                CREATE TABLE IF NOT EXISTS ratchet_sessions (
+                    conversation_id TEXT PRIMARY KEY,
+                    state BLOB NOT NULL,
+                    FOREIGN KEY (conversation_id) REFERENCES conversations(id)
+                );
+
+                CREATE TABLE IF NOT EXISTS pre_keys (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    public_key BLOB NOT NULL,
+                    secret_key BLOB NOT NULL,
+                    is_used INTEGER NOT NULL DEFAULT 0
+                );
                 ",
             )
             .map_err(|e| KalamError::Storage(format!("Failed to init schema: {e}")))?;
@@ -76,12 +109,12 @@ mod tests {
         let count: i64 = db
             .conn
             .query_row(
-                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('accounts','contacts','settings')",
+                "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('accounts','contacts','settings','conversations','messages','ratchet_sessions','pre_keys')",
                 [],
                 |row| row.get(0),
             )
             .unwrap();
-        assert_eq!(count, 3);
+        assert_eq!(count, 7);
     }
 
     #[test]

@@ -11,6 +11,8 @@ kalam-core = { path = "../kalam-core" }
 uniffi = { workspace = true }
 tokio = { workspace = true }
 serde_json = { workspace = true }
+rand = { workspace = true }
+hex = { workspace = true }
 
 [build-dependencies]
 uniffi = { workspace = true, features = ["build"] }

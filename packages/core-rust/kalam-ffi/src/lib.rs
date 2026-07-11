@@ -129,4 +129,94 @@ pub fn open_database(path: String, key: Vec<u8>) -> Result<bool, String> {
     Ok(true)
 }
 
+// ── P2: Crypto & Transport ────────────────────────────────
+
+/// Generate a full identity key bundle (identity key + signed pre-key + one-time pre-keys).
+///
+/// Returns a JSON string with the public components of the bundle.
+#[uniffi::export]
+pub fn generate_identity() -> Result<String, String> {
+    use kalam_core::crypto::keys::*;
+
+    let identity = generate_identity_key().map_err(|e| e.to_string())?;
+    let (spk, sig) = generate_signed_pre_key(&identity).map_err(|e| e.to_string())?;
+    let otpks = generate_one_time_pre_keys(10).map_err(|e| e.to_string())?;
+    let bundle = create_pre_key_bundle(&identity, &spk, &sig, &otpks);
+
+    serde_json::to_string(&serde_json::json!({
+        "identity_public_key": hex::encode(&bundle.identity_key),
+        "signed_pre_key": hex::encode(&bundle.signed_pre_key),
+        "signature": hex::encode(&bundle.signature),
+        "one_time_pre_keys": bundle.one_time_pre_keys.iter().map(hex::encode).collect::<Vec<_>>(),
+    }))
+    .map_err(|e| e.to_string())
+}
+
+/// Create an X3DH session with a remote party's pre-key bundle.
+///
+/// `their_bundle_json` is a JSON-encoded `PreKeyBundle`.
+/// Returns a JSON string with the X3DH header and a session identifier.
+#[uniffi::export]
+pub fn create_session(their_bundle_json: String) -> Result<String, String> {
+    use kalam_core::crypto::keys::*;
+    use kalam_core::crypto::x3dh::*;
+
+    let bundle: PreKeyBundle =
+        serde_json::from_str(&their_bundle_json).map_err(|e| e.to_string())?;
+    let our_identity = generate_identity_key().map_err(|e| e.to_string())?;
+    let (session, header) = initiate_x3dh(&our_identity, &bundle).map_err(|e| e.to_string())?;
+
+    let session_id = hex::encode(&session.associated_data);
+    serde_json::to_string(&serde_json::json!({
+        "session_id": session_id,
+        "header": {
+            "identity_key": hex::encode(&header.identity_key),
+            "ephemeral_key": hex::encode(&header.ephemeral_key),
+            "one_time_pre_key_id": header.one_time_pre_key_id,
+        },
+    }))
+    .map_err(|e| e.to_string())
+}
+
+/// Encrypt a plaintext message for a session.
+///
+/// Returns a JSON-encoded `RatchetMessage`.
+#[uniffi::export]
+pub fn encrypt_message(session_id: String, plaintext: String) -> Result<String, String> {
+    // NOTE: In production, session state would be loaded from storage by session_id.
+    // This is a simplified version that creates a fresh ratchet for demonstration.
+    let _ = session_id;
+    Err("Session persistence not yet implemented — use core API directly".to_string())
+}
+
+/// Decrypt a ciphertext message for a session.
+///
+/// Returns the plaintext string.
+#[uniffi::export]
+pub fn decrypt_message(session_id: String, ciphertext_json: String) -> Result<String, String> {
+    let _ = (session_id, ciphertext_json);
+    Err("Session persistence not yet implemented — use core API directly".to_string())
+}
+
+/// Create a payment voucher for batch message settlement.
+///
+/// Returns a JSON-encoded `Voucher`.
+#[uniffi::export]
+pub fn create_message_voucher(message_count: u64) -> Result<String, String> {
+    use kalam_core::transport::voucher;
+    use kalam_core::types::SigningKey;
+
+    let mut seed = vec![0u8; 32];
+    rand::RngCore::fill_bytes(&mut rand::thread_rng(), &mut seed);
+    let key = SigningKey::new(seed);
+    let epoch = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
+        / 3600;
+
+    let v = voucher::create_voucher(&key, message_count, epoch).map_err(|e| e.to_string())?;
+    serde_json::to_string(&v).map_err(|e| e.to_string())
+}
+
 uniffi::setup_scaffolding!();
