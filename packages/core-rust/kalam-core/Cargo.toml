@@ -1,0 +1,23 @@
+[package]
+name = "kalam-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+openmls = { workspace = true }
+openmls_rust_crypto = { workspace = true }
+x25519-dalek = { workspace = true }
+ed25519-dalek = { workspace = true }
+aes-gcm = { workspace = true }
+sha2 = { workspace = true }
+hkdf = { workspace = true }
+rand = { workspace = true }
+zeroize = { workspace = true }
+rusqlite = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+ethers = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }

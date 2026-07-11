@@ -1,0 +1,16 @@
+[package]
+name = "kalam-ffi"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+kalam-core = { path = "../kalam-core" }
+uniffi = { workspace = true }
+tokio = { workspace = true }
+serde_json = { workspace = true }
+
+[build-dependencies]
+uniffi = { workspace = true, features = ["build"] }

@@ -1,61 +1,76 @@
-# kalam
+# Kalam
 
-> Vos messages n'existent que sur vos téléphones.
+**Messagerie chiffrée, sans serveur, récupérable.**
 
-Messagerie chiffrée de bout en bout, décentralisée, sans serveur central. Impossible à éteindre.
+Vos messages n'existent que sur vos téléphones. Chiffré de bout en bout via le protocole MLS, sans serveur central, avec récupération sociale par gardiens.
 
-## Architecture
+## Structure du monorepo
 
 ```
-kalam/
+kalam-app/
 ├── apps/
 │   ├── mobile/          # React Native (Expo SDK 52)
 │   └── web/             # React (Vite 6 + react-native-web)
 ├── packages/
-│   ├── theme/           # Design tokens, ThemeProvider
-│   ├── ui/              # Shared component library
-│   ├── stores/          # Zustand state management
-│   ├── i18n/            # Internationalization (FR, EN)
-│   └── core-rust/       # Rust core (OpenMLS, Waku, crypto)
-├── turbo.json
-└── pnpm-workspace.yaml
+│   ├── theme/           # Design tokens, couleurs, typographie
+│   ├── ui/              # Composants partagés (mobile + web)
+│   ├── stores/          # État global (Zustand v5)
+│   └── i18n/            # Internationalisation (i18next, FR + EN)
+├── turbo.json           # Turborepo config
+├── pnpm-workspace.yaml  # pnpm workspaces
+└── tsconfig.base.json   # TypeScript config partagée
 ```
 
-## Stack
-
-- **Mobile:** React Native + Expo SDK 52
-- **Web:** Vite 6 + react-native-web
-- **Core:** Rust (uniffi mobile, WASM web)
-- **State:** Zustand v5
-- **Crypto:** X3DH + Double Ratchet (1:1), MLS RFC 9420 (groups)
-- **Transport:** Waku v2 (P2P)
-- **Chain:** Ethereum mainnet (ERC-4337, $KLM)
-
-## Development
+## Commandes de développement
 
 ```bash
-# Install dependencies
+# Installer les dépendances
 pnpm install
 
-# Start mobile
-pnpm dev:mobile
+# Lancer l'app mobile (Expo)
+pnpm --filter @kalam/mobile dev
 
-# Start web
-pnpm dev:web
+# Lancer l'app web (Vite)
+pnpm --filter @kalam/web dev
 
-# Build all
-pnpm build
+# Typecheck tout le monorepo
+pnpm turbo typecheck
 
-# Lint + typecheck
-pnpm lint && pnpm typecheck
+# Lint tout le monorepo
+pnpm turbo lint
+
+# Build web
+pnpm --filter @kalam/web build
+
+# Build mobile (iOS)
+pnpm --filter @kalam/mobile build:ios
+
+# Build mobile (Android)
+pnpm --filter @kalam/mobile build:android
 ```
 
-## Design System
+## Stack technique
 
-- **Fonts:** Bricolage Grotesque (display), Inter (body), JetBrains Mono (technical)
-- **Colors:** Green (#1DAB61), Deep (#0B5C3B), Yellow (#F5C518 — value only)
-- **Dark mode:** Immersive green night (#0E2A1F)
+| Couche | Technologie |
+|--------|-------------|
+| Mobile | React Native + Expo SDK 52, Expo Router |
+| Web | React 18 + Vite 6 + react-native-web |
+| Navigation | Expo Router (mobile), React Router v7 (web) |
+| État | Zustand v5 avec persist (MMKV mobile / localStorage web) |
+| i18n | i18next + react-i18next (FR, EN) |
+| Chiffrement | MLS (futur core Rust → WASM) |
+| Blockchain | ERC-4337 smart accounts, $KLM token |
+| Monorepo | Turborepo + pnpm workspaces |
 
-## License
+## Design tokens
 
-Proprietary — Ikigai Intl © 2026
+- Police UI : **Inter** (400, 500, 600)
+- Police display : **Bricolage Grotesque** (600, 700, 800)
+- Police technique : **JetBrains Mono** (400, 500)
+- Couleur primaire : `#1DAB61` (green)
+- Couleur deep : `#0B5C3B`
+- Couleur valeur : `#F5C518` (yellow)
+
+## Licence
+
+Propriétaire — © 2026 Ikigai
