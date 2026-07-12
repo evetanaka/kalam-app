@@ -30,17 +30,33 @@ const webStorage: StateStorage = {
 }
 
 /**
- * React Native MMKV storage adapter.
+ * React Native storage adapter.
+ * Tries MMKV first (native build), falls back to AsyncStorage (Expo Go).
  * Lazy-loaded to avoid import errors on web.
  */
-const createMMKVStorage = (): StateStorage => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { MMKV } = require('react-native-mmkv') as { MMKV: new () => { getString: (k: string) => string | undefined; set: (k: string, v: string) => void; delete: (k: string) => void } }
-  const mmkv = new MMKV()
-  return {
-    getItem: (name: string) => mmkv.getString(name) ?? null,
-    setItem: (name: string, value: string) => mmkv.set(name, value),
-    removeItem: (name: string) => mmkv.delete(name),
+const createNativeStorage = (): StateStorage => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { MMKV } = require('react-native-mmkv') as { MMKV: new () => { getString: (k: string) => string | undefined; set: (k: string, v: string) => void; delete: (k: string) => void } }
+    const mmkv = new MMKV()
+    return {
+      getItem: (name: string) => mmkv.getString(name) ?? null,
+      setItem: (name: string, value: string) => mmkv.set(name, value),
+      removeItem: (name: string) => mmkv.delete(name),
+    }
+  } catch {
+    // Fallback for Expo Go (no native modules)
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const AsyncStorage = require('@react-native-async-storage/async-storage').default as {
+      getItem: (k: string) => Promise<string | null>;
+      setItem: (k: string, v: string) => Promise<void>;
+      removeItem: (k: string) => Promise<void>;
+    }
+    return {
+      getItem: (name: string) => AsyncStorage.getItem(name),
+      setItem: (name: string, value: string) => AsyncStorage.setItem(name, value),
+      removeItem: (name: string) => AsyncStorage.removeItem(name),
+    }
   }
 }
 
@@ -48,5 +64,5 @@ const createMMKVStorage = (): StateStorage => {
  * The storage adapter to use with zustand persist middleware.
  */
 export const storageAdapter: StateStorage = isReactNative
-  ? createMMKVStorage()
+  ? createNativeStorage()
   : webStorage

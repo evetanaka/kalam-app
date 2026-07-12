@@ -14,8 +14,7 @@
       "developmentClient": false,
       "distribution": "internal",
       "ios": {
-        "simulator": true,
-        "buildType": "simulator"
+        "simulator": true
       }
     },
     "preview": {
