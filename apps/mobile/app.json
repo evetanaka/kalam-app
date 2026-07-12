@@ -45,12 +45,6 @@
         "projectId": "ab19a7ed-e669-48eb-9e8b-5e9be8c54f0b"
       }
     },
-    "owner": "berrehili",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/ab19a7ed-e669-48eb-9e8b-5e9be8c54f0b"
-    }
+    "owner": "berrehili"
   }
 }
