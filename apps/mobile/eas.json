@@ -13,6 +13,7 @@
     "simulator": {
       "developmentClient": false,
       "distribution": "internal",
+      "channel": "staging",
       "ios": {
         "simulator": true
       }
